@@ -1,10 +1,8 @@
 name: Bilibili Fans Tracker
 
 on:
-  #schedule:
-    #- cron: "0 16 * * *"  # UTC时间16:00执行（北京时间次日00:00）
   schedule:
-  - cron: "*/5 * * * *"  # 每5分钟运行一次（测试用）
+    - cron: "0 16 * * *"  # UTC时间16:00执行（北京时间次日00:00）
   workflow_dispatch:  # 允许手动触发
 
 jobs:
