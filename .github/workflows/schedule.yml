@@ -11,6 +11,9 @@ jobs:
     steps:
     - name: 检出代码
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 设置Python
       uses: actions/setup-python@v4
@@ -27,6 +30,7 @@ jobs:
       run: |
         git config --global user.name 'Auto-Committer'
         git config --global user.email 'actions@users.noreply.github.com'
+        git pull origin main --allow-unrelated-histories --rebase
         git add bilibili_fans_data.xlsx
-        git commit -am "自动更新粉丝数据"
-        git push
+        git commit -am "自动更新粉丝数据 $(date +'%Y-%m-%d %H:%M:%S')"
+        git push origin HEAD:main --force
