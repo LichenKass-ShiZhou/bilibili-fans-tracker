@@ -6,7 +6,7 @@ from time import sleep
 
 # 配置参数
 UID = "381875112"  # 摩尔线程B站UID（在官网URL中找到）
-EXCEL_PATH = "bilibili_fans_data.xlsx"
+EXCEL_PATH = "bilibili_fans.xlsx"
 
 def get_bili_fans(uid):
     """通过B站API获取粉丝数"""
