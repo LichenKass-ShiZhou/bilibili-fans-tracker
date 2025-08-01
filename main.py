@@ -5,7 +5,8 @@ import os
 from time import sleep
 
 # 配置参数
-UID = "381875112"  # 摩尔线程B站UID（在官网URL中找到）
+UID_MOORE = "381875112"         # 摩尔线程B站UID
+UID_LISUAN = "3546938628638822"  # 砺算科技B站UID
 EXCEL_PATH = "bilibili_fans_data.xlsx"
 
 def get_bili_fans(uid):
@@ -22,34 +23,61 @@ def get_bili_fans(uid):
         if data["code"] == 0:
             return data["data"]["follower"]
         else:
-            print(f"API错误: {data['message']}")
+            print(f"API错误 (UID:{uid}): {data['message']}")
             return None
     except Exception as e:
-        print(f"请求失败: {str(e)}")
+        print(f"请求失败 (UID:{uid}): {str(e)}")
         return None
 
-def save_to_excel(fans_count, file_path):
-    """保存数据到Excel（自动创建文件或追加数据）"""
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_data = pd.DataFrame({
-        "日期": [current_time.split()[0]],
-        "时间": [current_time.split()[1]],
-        "粉丝数": [fans_count]
-    })
+def save_to_excel(moore_fans, lisuan_fans, file_path):
+    """保存数据到Excel，两个账号的粉丝数在同一行"""
+    current_time = datetime.datetime.now()
+    date_str = current_time.strftime("%Y-%m-%d")
+    time_str = current_time.strftime("%H:%M:%S")
     
+    # 创建新数据行
+    new_data = {
+        "日期": date_str,
+        "时间": time_str,
+        "摩尔线程粉丝数": moore_fans,
+        "砺算科技粉丝数": lisuan_fans
+    }
+    
+    # 创建DataFrame
+    new_df = pd.DataFrame([new_data])
+    
+    # 处理Excel文件
     if os.path.exists(file_path):
+        # 读取现有文件
         df = pd.read_excel(file_path)
-        df = pd.concat([df, new_data], ignore_index=True)
+        # 追加新数据
+        df = pd.concat([df, new_df], ignore_index=True)
     else:
-        df = new_data
+        df = new_df
     
+    # 保存到Excel
     df.to_excel(file_path, index=False)
     print(f"数据已保存到 {file_path}")
 
 if __name__ == "__main__":
-    fans = get_bili_fans(UID)
-    if fans is not None:
-        print(f"当前粉丝数: {fans}")
-        save_to_excel(fans, EXCEL_PATH)
+    # 获取摩尔线程粉丝数
+    moore_fans = get_bili_fans(UID_MOORE)
+    if moore_fans is not None:
+        print(f"摩尔线程当前粉丝数: {moore_fans}")
     else:
-        print("未获取到有效数据")
+        print("摩尔线程未获取到有效数据")
+        moore_fans = ""  # 设置为空字符串以便保存
+    
+    # 添加延迟
+    sleep(1)
+    
+    # 获取砺算科技粉丝数
+    lisuan_fans = get_bili_fans(UID_LISUAN)
+    if lisuan_fans is not None:
+        print(f"砺算科技当前粉丝数: {lisuan_fans}")
+    else:
+        print("砺算科技未获取到有效数据")
+        lisuan_fans = ""  # 设置为空字符串以便保存
+    
+    # 保存到Excel
+    save_to_excel(moore_fans, lisuan_fans, EXCEL_PATH)
